@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terra — Meaningful Work</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --dark:#1f2a24;
+    --light:#f5f3ef;
+    --accent:#c07a3a;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:var(--light);
+    color:#222;
+}
+
+/* NAV */
+nav{
+    padding:20px 60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-family:'Playfair Display',serif;
+    font-size:28px;
+    font-weight:600;
+    color:var(--dark);
+    text-decoration:none;
+}
+
+nav a{
+    margin-left:30px;
+    text-decoration:none;
+    color:var(--dark);
+    font-weight:500;
+}
+
+/* HERO */
+.hero{
+    padding:120px 60px;
+    background:var(--dark);
+    color:white;
+}
+
+.hero h1{
+    font-family:'Playfair Display',serif;
+    font-size:48px;
+    max-width:600px;
+    margin-bottom:20px;
+}
+
+.hero p{
+    opacity:0.8;
+    margin-bottom:30px;
+}
+
+.btn{
+    background:var(--accent);
+    padding:12px 28px;
+    border-radius:40px;
+    text-decoration:none;
+    color:white;
+    font-weight:500;
+}
+
+/* SEARCH */
+.search{
+    padding:40px 60px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.search input, .search select{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    flex:1;
+}
+
+.search button{
+    padding:12px 24px;
+    background:var(--dark);
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* JOBS */
+.jobs{
+    padding:60px;
+}
+
+.jobs h2{
+    font-family:'Playfair Display',serif;
+    margin-bottom:40px;
+}
+
+.job-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
