@@ -110,3 +110,118 @@ nav a{
 .job-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
+
+.job{
+    background:white;
+    padding:20px;
+    border-radius:16px;
+    border:1px solid #eee;
+}
+
+.job h3{
+    font-family:'Playfair Display',serif;
+    margin-bottom:8px;
+}
+
+.job p{
+    font-size:14px;
+    opacity:0.7;
+    margin-bottom:10px;
+}
+
+.tag{
+    display:inline-block;
+    background:#eee;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-right:5px;
+}
+
+/* FOOTER */
+footer{
+    padding:40px 60px;
+    text-align:center;
+    background:var(--dark);
+    color:white;
+    margin-top:80px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <a href="#" class="logo">Terra.</a>
+    <div>
+        <a href="#">Jobs</a>
+        <a href="#">Companies</a>
+        <a href="#">Login</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Find work that respects your ambition.</h1>
+    <p>We connect thoughtful companies with driven professionals.</p>
+    <a href="#jobs" class="btn">Browse Jobs</a>
+</section>
+
+<section class="search">
+    <input type="text" id="searchInput" placeholder="Search jobs...">
+    <select id="category">
+        <option value="">All</option>
+        <option value="design">Design</option>
+        <option value="engineering">Engineering</option>
+        <option value="product">Product</option>
+    </select>
+    <button onclick="filterJobs()">Search</button>
+</section>
+
+<section class="jobs" id="jobs">
+    <h2>Featured Roles</h2>
+    <div class="job-grid" id="jobGrid"></div>
+</section>
+
+<footer>
+    © 2026 Terra Careers — Built for meaningful work.
+</footer>
+
+<script>
+const jobs = [
+{title:"Product Designer",company:"Notion",category:"design",location:"Remote"},
+{title:"Frontend Engineer",company:"Linear",category:"engineering",location:"Remote"},
+{title:"Backend Engineer",company:"Stripe",category:"engineering",location:"Seattle"},
+{title:"Product Manager",company:"Airbnb",category:"product",location:"San Francisco"}
+];
+
+function renderJobs(list){
+    const grid=document.getElementById("jobGrid");
+    grid.innerHTML="";
+    list.forEach(job=>{
+        grid.innerHTML+=`
+        <div class="job">
+            <h3>${job.title}</h3>
+            <p>${job.company} • ${job.location}</p>
+            <span class="tag">${job.category}</span>
+        </div>`;
+    });
+}
+
+function filterJobs(){
+    const term=document.getElementById("searchInput").value.toLowerCase();
+    const category=document.getElementById("category").value;
+    const filtered=jobs.filter(job=>{
+        const matchText=job.title.toLowerCase().includes(term) || job.company.toLowerCase().includes(term);
+        const matchCategory=!category || job.category===category;
+        return matchText && matchCategory;
+    });
+    renderJobs(filtered);
+}
+
+renderJobs(jobs);
+</script>
+
+</body>
+</html>
