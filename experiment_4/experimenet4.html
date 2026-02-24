@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exp 4 – Job Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1f1f1f;
+      --border: #2a2a2a;
+      --accent: #e8ff47;
+      --accent2: #ff6b35;
+      --text: #f0f0f0;
+      --muted: #888;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-tag {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 5px 14px;
+      border-radius: 100px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      min-height: calc(100vh - 65px);
+    }
+
+    @media(max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { padding: 18px 24px; }
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 36px 32px;
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 65px);
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .form-header { margin-bottom: 28px; }
+
+    .form-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .form-header h2 .hi { color: var(--accent); }
+
+    .form-header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input::placeholder, textarea::placeholder { color: #555; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(232,255,71,0.1);
+    }
+
+    select option { background: #1f1f1f; }
+    textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .type-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .type-btn {
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .type-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .type-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .board {
+      padding: 36px 40px;
+      overflow-y: auto;
+    }
+
+    @media(max-width: 900px) { .board { padding: 28px 20px; } }
+
+    .board-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .board-top h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .count-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .count-badge span { color: var(--accent); }
+
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      color: var(--muted);
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty-icon { font-size: 3.5rem; filter: grayscale(1); }
+
+    .empty h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      color: #444;
+    }
+
+    .empty p { font-size: 13px; color: #444; }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .job-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+      animation: slideUp 0.4s ease both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .job-card:hover { transform: translateY(-3px); border-color: #3a3a3a; }
+
+    .job-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .job-card[data-type="Full-Time"]::before   { background: var(--accent); }
+    .job-card[data-type="Part-Time"]::before   { background: #7c3aed; }
+    .job-card[data-type="Remote"]::before      { background: #06b6d4; }
+    .job-card[data-type="Hybrid"]::before      { background: var(--accent2); }
+    .job-card[data-type="Internship"]::before  { background: #ec4899; }
+    .job-card[data-type="Freelance"]::before   { background: #10b981; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .company-logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+
+    .type-pill {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid;
+    }
+
+    .type-pill[data-t="Full-Time"]  { color: var(--accent); border-color: rgba(232,255,71,0.3); background: rgba(232,255,71,0.08); }
+    .type-pill[data-t="Part-Time"]  { color: #a78bfa; border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.08); }
+    .type-pill[data-t="Remote"]     { color: #67e8f9; border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.08); }
+    .type-pill[data-t="Hybrid"]     { color: var(--accent2); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.08); }
+    .type-pill[data-t="Internship"] { color: #f472b6; border-color: rgba(236,72,153,0.3); background: rgba(236,72,153,0.08); }
+    .type-pill[data-t="Freelance"]  { color: #34d399; border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .card-company { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    .card-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: #999;
+      background: var(--surface2);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .meta-chip svg { width: 12px; height: 12px; opacity: 0.6; }
+
+    .card-desc {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-salary {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .card-salary.empty-sal { color: var(--muted); font-size: 12px; font-family: 'Manrope', sans-serif; }
+
+    .apply-btn {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      padding: 7px 16px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .apply-btn:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+
+    .delete-btn {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #555;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      opacity: 0;
+    }
+
+    .job-card:hover .delete-btn { opacity: 1; }
+
+    .delete-btn:hover {
+      background: rgba(255,60,60,0.15);
+      border-color: rgba(255,60,60,0.3);
+      color: #ff6060;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background: var(--accent);
+      color: #000;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      z-index: 999;
+      animation: toastIn 0.3s ease;
+    }
+
+    .toast.error { background: #ff4444; color: #fff; }
+    .toast.hide { animation: toastOut 0.3s ease forwards; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(16px); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">job<span>board</span>.</div>
+  <div class="nav-tag">Experiment 4</div>
+</nav>
+
+<div class="layout">
+
+  <!-- FORM SIDEBAR -->
+  <aside class="sidebar">
+    <div class="form-header">
+      <h2>Post a <span class="hi">New</span><br/>Job Opening</h2>
+      <p>Fill the form — card appears instantly on submit.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Job Title *</label>
+      <input type="text" id="jobTitle" placeholder="e.g. Senior UX Designer"/>
+    </div>
+
+    <div class="form-group">
+      <label>Company Name *</label>
+      <input type="text" id="company" placeholder="e.g. Acme Corp"/>
+    </div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" id="location" placeholder="e.g. Mumbai"/>
+      </div>
+      <div class="form-group">
+        <label>Salary / CTC</label>
+        <input type="text" id="salary" placeholder="e.g. ₹12 LPA"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Department</label>
+      <select id="department">
+        <option value="">Select Department</option>
+        <option>Engineering</option>
+        <option>Design</option>
+        <option>Marketing</option>
+        <option>Sales</option>
+        <option>Finance</option>
+        <option>Operations</option>
+        <option>HR</option>
+        <option>Product</option>
+        <option>Legal</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Experience Required</label>
+      <select id="experience">
+        <option value="">Select Level</option>
+        <option>Fresher</option>
+        <option>1–3 Years</option>
+        <option>3–5 Years</option>
+        <option>5–8 Years</option>
+        <option>8+ Years</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Job Type</label>
+      <div class="type-btns" id="typeGroup">
+        <button class="type-btn active" onclick="selectType(this)">Full-Time</button>
+        <button class="type-btn" onclick="selectType(this)">Part-Time</button>
+        <button class="type-btn" onclick="selectType(this)">Remote</button>
+        <button class="type-btn" onclick="selectType(this)">Hybrid</button>
+        <button class="type-btn" onclick="selectType(this)">Internship</button>
+        <button class="type-btn" onclick="selectType(this)">Freelance</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Job Description</label>
+      <textarea id="description" placeholder="Describe responsibilities, requirements, and benefits..."></textarea>
+    </div>
+
+    <button class="submit-btn" onclick="postJob()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      Post Job
+    </button>
+  </aside>
+
+  <!-- BOARD SECTION -->
+  <main class="board">
+    <div class="board-top">
+      <h3>Live Job Listings</h3>
+      <div class="count-badge"><span id="countNum">0</span> jobs posted</div>
+    </div>
+
+    <div id="emptyState" class="empty">
+      <div class="empty-icon">📭</div>
+      <h4>No jobs posted yet</h4>
+      <p>Use the form to post your first job opening.</p>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid"></div>
+  </main>
+</div>
+
+<script>
+  let selectedType = 'Full-Time';
+  let jobCount = 0;
+
+  function selectType(btn) {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.textContent;
+  }
+
+  function postJob() {
+    const title   = document.getElementById('jobTitle').value.trim();
+    const company = document.getElementById('company').value.trim();
+    const loc     = document.getElementById('location').value.trim();
+    const salary  = document.getElementById('salary').value.trim();
+    const dept    = document.getElementById('department').value;
+    const exp     = document.getElementById('experience').value;
+    const desc    = document.getElementById('description').value.trim();
+
+    if (!title || !company) {
+      showToast('Job Title & Company are required!', true);
+      return;
+    }
+
+    const card = createCard({ title, company, loc, salary, dept, exp, desc, type: selectedType });
+    const grid = document.getElementById('cardsGrid');
+    grid.prepend(card);
+    document.getElementById('emptyState').style.display = 'none';
+    jobCount++;
+    document.getElementById('countNum').textContent = jobCount;
+    resetForm();
+    showToast('Job posted successfully!');
+  }
+
+  function createCard({ title, company, loc, salary, dept, exp, desc, type }) {
+    const initial = company.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+    const pinIcon   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>`;
+    const clockIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+    const bagIcon   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>`;
+
+    const metaItems = [
+      loc  ? `<div class="meta-chip">${pinIcon} ${loc}</div>` : '',
+      exp  ? `<div class="meta-chip">${clockIcon} ${exp}</div>` : '',
+      dept ? `<div class="meta-chip">${bagIcon} ${dept}</div>` : '',
+    ].filter(Boolean).join('');
+
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    card.setAttribute('data-type', type);
+
+    card.innerHTML = `
+      <button class="delete-btn" title="Remove" onclick="removeCard(this)">✕</button>
+      <div class="card-top">
+        <div class="company-logo">${initial || '?'}</div>
+        <div class="type-pill" data-t="${type}">${type}</div>
+      </div>
+      <div class="card-title">${title}</div>
+      <div class="card-company">${company}</div>
+      ${metaItems ? `<div class="card-meta">${metaItems}</div>` : '<div style="height:10px"></div>'}
+      ${desc ? `<div class="card-desc">${desc}</div>` : ''}
+      <div class="card-footer">
+        <div class="card-salary ${salary ? '' : 'empty-sal'}">${salary || 'Salary not disclosed'}</div>
+        <button class="apply-btn">Apply Now →</button>
+      </div>
+    `;
+    return card;
+  }
+
+  function removeCard(btn) {
+    const card = btn.closest('.job-card');
+    card.style.transition = 'opacity 0.25s, transform 0.25s';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      card.remove();
+      jobCount = Math.max(0, jobCount - 1);
+      document.getElementById('countNum').textContent = jobCount;
+      if (jobCount === 0) document.getElementById('emptyState').style.display = 'flex';
+    }, 250);
+  }
+
+  function resetForm() {
+    ['jobTitle', 'company', 'location', 'salary', 'description'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('department').value = '';
+    document.getElementById('experience').value = '';
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.type-btn').classList.add('active');
+    selectedType = 'Full-Time';
+  }
+
+  function showToast(msg, isError = false) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const t = document.createElement('div');
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.textContent = (isError ? '⚠️ ' : '✅ ') + msg;
+    document.body.appendChild(t);
+    setTimeout(() => {
+      t.classList.add('hide');
+      setTimeout(() => t.remove(), 300);
+    }, 2500);
+  }
+</script>
+</body>
+</html>
