@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p id="message">This is a paragraph.</p>
+    <button id="changeBtn">Click me</button>
+
+    <script>
+        const messageEl = document.getElementById('message');
+        const buttonEl = document.getElementById('changeBtn');
+
+        buttonEl.addEventListener('click', () => {
+            messageEl.textContent = 'Welcome to JavaScript DOM Manipulation';
+            messageEl.style.color = 'blue';
+            messageEl.style.fontSize = '24px';
+        });
+    </script>
+</body>
+</html>
